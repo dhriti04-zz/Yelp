@@ -10,22 +10,26 @@ import UIKit
 
 class BusinessesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     
+    @IBOutlet weak var navBar: UINavigationItem!
     @IBOutlet weak var tableView: UITableView!
 
+    let searchBar = UISearchBar()
     var businesses: [Business]!
+    var showSearchResults = false
+    var filteredArray: [Business]!
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         createSearchBar()
         
-        let navigationBarAppearace = UINavigationBar.appearance()
-        
-        navigationBarAppearace.tintColor = UIColor.red
-        navigationBarAppearace.barTintColor = UIColor.red
-  
         //self.navigationItem.title = "Yelp"
         
-
+        navigationController?.navigationBar.tintColor = .white
+        navigationController?.navigationBar.backgroundColor = .red
+        navigationController?.navigationBar.barTintColor = .red
+        
         
         tableView.delegate = self;
         tableView.dataSource = self;
@@ -59,9 +63,9 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     func createSearchBar() {
-        let searchBar = UISearchBar()
+        
         searchBar.showsCancelButton = false
-        searchBar.placeholder = "Seach for your restaurant"
+        searchBar.placeholder = "Restuarant"
         searchBar.delegate = self
         
         self.navigationItem.titleView = searchBar
@@ -69,17 +73,49 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         
     }
     
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        let mySearch = searchBar.text!
+        Business.searchWithTerm(term: mySearch, completion: { (filteredArray: [Business]?, error: Error?) -> Void in
+            
+            self.filteredArray = filteredArray
+            self.tableView.reloadData()
+        }
+        )
+        
+        if searchBar.text == "" {
+            showSearchResults = false
+            self.tableView.reloadData()
+        }
+        
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        searchBar.endEditing(true)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        showSearchResults = true
+        searchBar.endEditing(true)
+        self.tableView.reloadData()
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if businesses != nil {
-            return businesses!.count
+        
+        if (showSearchResults) {
+            return filteredArray!.count
         }
-        else{
-            return 0
+        else {
+            if businesses != nil {
+                return businesses!.count
+            }
+            else{
+                return 0
+            }
         }
     }
     
@@ -88,8 +124,12 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell{
         let cell = tableView.dequeueReusableCell(withIdentifier: "BusinessCell", for: indexPath) as! BusinessCell
         
-        cell.business = businesses [indexPath.row]
-        
+        if (showSearchResults){
+            cell.business = filteredArray [indexPath.row]
+        }
+        else {
+            cell.business = businesses [indexPath.row]
+        }
         
         return cell
     }

@@ -134,8 +134,13 @@
                             <constraint firstItem="iMQ-Dd-oNF" firstAttribute="leading" secondItem="XhR-oz-92f" secondAttribute="leading" id="us2-Me-ihL"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="3MH-Kt-QJc"/>
+                    <navigationItem key="navigationItem" id="3MH-Kt-QJc">
+                        <barButtonItem key="leftBarButtonItem" title="Filter" id="06z-yT-yL8">
+                            <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
+                        <outlet property="navBar" destination="3MH-Kt-QJc" id="HbW-LE-K3p"/>
                         <outlet property="tableView" destination="iMQ-Dd-oNF" id="Xsr-Us-XrD"/>
                     </connections>
                 </viewController>
